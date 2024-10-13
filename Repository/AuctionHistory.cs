@@ -7,7 +7,11 @@ public class AuctionHistory
 {
     public interface IAuctionHistoryRepository
     {
-        Task<List<Models.Model.AuctionHistory>> GetAll();
+        IQueryable<Models.Model.AuctionHistory>  GetAll();
+        IQueryable<Models.Model.AuctionHistory> GetById(int id);
+        Models.Model.AuctionHistory Create(Models.Model.AuctionHistory auctionHistory);
+        public void Update(Models.Model.AuctionHistory auctionHistory);
+        public void Delete(Models.Model.AuctionHistory auctionHistory);
     }
 
     public sealed class AuctionHistoryRepository : IAuctionHistoryRepository
@@ -19,9 +23,33 @@ public class AuctionHistory
             _context = context;
         }
 
-        public async Task<List<Models.Model.AuctionHistory>> GetAll()
+        public IQueryable<Models.Model.AuctionHistory> GetAll()
         {
-            return await _context.AuctionHistories.ToListAsync();
+            return  _context.AuctionHistories.AsQueryable();
+        }
+
+        public IQueryable<Models.Model.AuctionHistory> GetById(int id)
+        {
+            return _context.AuctionHistories.Where(x => x.HistoryId == id);
+        }
+
+        public Models.Model.AuctionHistory Create(Models.Model.AuctionHistory auctionHistory)
+        {
+            _context.AuctionHistories.Add(auctionHistory);
+            _context.SaveChanges();
+            return auctionHistory;
+        }
+
+        public void Update(Models.Model.AuctionHistory auctionHistory)
+        {
+            _context.AuctionHistories.Update(auctionHistory);
+            _context.SaveChanges();
+        }
+
+        public void Delete(Models.Model.AuctionHistory auctionHistory)
+        {
+            _context.AuctionHistories.Remove(auctionHistory);
+            _context.SaveChanges();
         }
     }
 }

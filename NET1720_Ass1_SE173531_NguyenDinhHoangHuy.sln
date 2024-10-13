@@ -6,8 +6,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "Repository\Re
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{3C86E64C-CB6A-4D08-AF20-C5FCB470B5F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service", "Service\Service.csproj", "{266F81C4-425A-47E2-B0B5-0BD6B89A12AC}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +24,5 @@ Global
 		{3C86E64C-CB6A-4D08-AF20-C5FCB470B5F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C86E64C-CB6A-4D08-AF20-C5FCB470B5F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C86E64C-CB6A-4D08-AF20-C5FCB470B5F8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{266F81C4-425A-47E2-B0B5-0BD6B89A12AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{266F81C4-425A-47E2-B0B5-0BD6B89A12AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{266F81C4-425A-47E2-B0B5-0BD6B89A12AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{266F81C4-425A-47E2-B0B5-0BD6B89A12AC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

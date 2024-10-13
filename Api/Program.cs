@@ -5,7 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using Microsoft.OpenApi.Models;
 using Models.Model;
+using Repository;
 using AuctionHistory = Repository.AuctionHistory;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,13 +17,41 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 // Add DI
 builder.Services.AddDbContext<KoiFishAuctionDbContext>(opt => opt.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddScoped<AuctionHistory.IAuctionHistoryRepository, AuctionHistory.AuctionHistoryRepository>();
+builder.Services.AddScoped<AuctionHistory.IAuctionHistoryRepository,AuctionHistory.AuctionHistoryRepository>();
+builder.Services.AddScoped<Auth.IAuthRepository,Auth.AuthRepository>();
 
+builder.Services.AddSwaggerGen(c =>
+{
+    c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+    c.IgnoreObsoleteActions();
+    c.IgnoreObsoleteProperties();
+    c.CustomSchemaIds(type => type.FullName);
+    // Add JWT Bearer Authentication to Swagger
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter JWT with Bearer into field",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { new OpenApiSecurityScheme
+        {
+            Reference = new OpenApiReference
+            {
+                Type = ReferenceType.SecurityScheme,
+                Id = "Bearer"
+            }
+        }, new string[] {} }
+    });
+});
 
 // setup OData
 builder.Services.AddControllers().AddOData(options => {
@@ -35,14 +65,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         opt.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
+            ValidateIssuer = false,
+            ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JWTSection:SecretKey").Value)),
-            ValidIssuer = builder.Configuration.GetSection("JWTSection:Issuer").Value,
-            ValidAudience = builder.Configuration.GetSection("JWTSection:Audience").Value,
+                Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JWTSection:SecretKey").Value))
         };
     });
 
@@ -52,9 +80,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"));
 }
 
+app.UseODataBatching();
+app.UseRouting();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
